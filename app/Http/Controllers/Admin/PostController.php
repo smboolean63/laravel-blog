@@ -12,6 +12,13 @@ use App\Tag;
 
 class PostController extends Controller
 {
+    private $validation = [
+        'title' => 'required|string|max:255',
+        'content' => 'required|string|max:65535',
+        'published' => 'sometimes|accepted',
+        'category_id' => 'nullable|exists:categories,id',
+        'tags' => 'nullable|exists:tags,id',
+    ];
     /**
      * Display a listing of the resource.
      *
@@ -46,13 +53,7 @@ class PostController extends Controller
     public function store(Request $request)
     {
         // validazione
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string|max:65535',
-            'published' => 'sometimes|accepted',
-            'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|exists:tags,id',
-        ]);
+        $request->validate($this->validation);
         // prendo i dati dalla request e creo il post
         $data = $request->all();
         $newPost = new Post();
@@ -110,13 +111,7 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         // validazione
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string|max:65535',
-            'published' => 'sometimes|accepted',
-            'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|exists:tags,id',
-        ]);
+        $request->validate($this->validation);
         // aggiornamento
         $data = $request->all();
         // se cambia il titolo genero un altro slug
