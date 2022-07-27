@@ -28,9 +28,6 @@ export default {
         .then((response) => {
             this.posts = response.data;
         })
-        .catch((e) => {
-            console.log(e);
-        });
     },
 }
 </script>
