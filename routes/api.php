@@ -21,3 +21,6 @@ Route::get('posts/{slug}', 'Api\PostController@show');
 Route::get('categories', 'Api\CategoryController@index');
 // api/categories/{slug}
 Route::get('categories/{slug}', 'Api\CategoryController@show');
+
+// api/tags/{slug}
+Route::get('tags/{slug}', 'Api\TagController@show');
