@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 use App\Post;
 use App\Category;
@@ -19,6 +20,7 @@ class PostController extends Controller
         'published' => 'sometimes|accepted',
         'category_id' => 'nullable|exists:categories,id',
         'tags' => 'nullable|exists:tags,id',
+        'image' => 'nullable|image|max:500'
     ];
     /**
      * Display a listing of the resource.
@@ -55,10 +57,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        // validazione
-        $request->validate($this->validation);
-        // prendo i dati dalla request e creo il post
-        $data = $request->all();
+        $data = $request->validate($this->validation);
         $newPost = new Post();
         $newPost->fill($data);
 
@@ -68,6 +67,11 @@ class PostController extends Controller
 
         // associo l'utente al post
         $newPost->user_id = Auth::id(); // mi restituisce l'id dell'utente loggato
+
+        // aggiungo l'immagine se è presente
+        if(isset($data['image'])) {
+            $newPost->image = Storage::put('uploads', $data['image']);
+        }
 
         $newPost->save();
 
@@ -141,6 +145,14 @@ class PostController extends Controller
 
         $post->published = isset($data['published']); // true o false
 
+        if(isset($data['image'])) {
+            if($post->image) {
+                Storage::delete($post->image);
+            }
+
+            $post->image = Storage::put('uploads', $data['image']);
+        }
+
         $post->save();
 
         $tags = isset($data['tags']) ? $data['tags'] : [];
@@ -160,6 +172,10 @@ class PostController extends Controller
     {
         if($post->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if($post->image) {
+            Storage::delete($post->image);
         }
 
         $post->delete();
