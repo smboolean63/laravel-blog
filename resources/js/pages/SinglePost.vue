@@ -11,6 +11,40 @@
                 <li v-for="tag in post.tags" :key="tag.id"><router-link :to="{ name: 'single-tag', params: {slug: tag.slug} }">{{tag.name}}</router-link></li>
             </ul>
         </div>
+        <div class="mt-3" v-if="post.comments.length > 0">
+            <h3>Commenti</h3>
+            <ul>
+                <li v-for="comment in post.comments" :key="comment.id">
+                    <h4>{{comment.name ? comment.name : 'Anonimo'}}</h4>
+                    <div>
+                        {{comment.content}}
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="mt-3">
+            <h3>Lascia un commento</h3>
+            <form @submit.prevent="addComment()">
+                <div class="mb-1">
+                    <input type="text" name="name" placeholder="Inserisci il nome" v-model="formData.name">
+                    <ul v-if="errors.name" style="color:red">
+                        <li v-for="(err, index) in errors.name" :key="index">{{err}}</li>
+                    </ul>
+                </div>
+                <div class="mb-1">
+                    <textarea name="content" id="content" cols="30" rows="10" placeholder="Inserisci il testo del commento" v-model="formData.content"></textarea>
+                    <ul v-if="errors.content" style="color:red">
+                        <li v-for="(err, index) in errors.content" :key="index">{{err}}</li>
+                    </ul>
+                </div>
+                <div>
+                    <button type="submit">Aggiungi Commento</button>
+                </div>
+                <div v-if="commentSent" class="mt-3" style="color: green; border: 1px solid green">
+                    Commento inserito in fase di approvazione
+                </div>
+            </form>
+        </div>
         <div class="mt-5">
             <router-link :to="{name: 'home'}">Home Page</router-link>
         </div>
@@ -22,7 +56,13 @@ export default {
     name: 'SinglePost',
     data() {
         return {
-            post: null
+            post: null,
+            formData: {
+                name: '',
+                content: '',
+            },
+            commentSent: false,
+            errors: {}
         }
     },
     created() {
@@ -35,6 +75,21 @@ export default {
                 // redirect alla pagina 404
                 this.$router.push({name: 'page-404'});
             });
+    },
+    methods: {
+        addComment() {
+            // richiesta axios di tipo post per aggiungere il commento
+            axios.post(`/api/comments/${this.post.id}`, this.formData)
+                .then((resp) => {
+                    // console.log(resp.data.data);
+                    this.commentSent = true;
+                    this.formData.name = "";
+                    this.formData.content = "";
+                })
+                .catch((error) => {
+                    this.errors = error.response.data.errors;
+                });
+        }
     }
 }
 </script>

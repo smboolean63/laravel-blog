@@ -26,6 +26,10 @@ Route::middleware('auth')
     Route::resource('posts', 'PostController');
     Route::resource('categories', 'CategoryController');
     Route::resource('tags', 'TagController');
+
+    Route::get('comments', 'CommentController@index')->name('comments.index');
+    Route::patch('comments/{comment}', 'CommentController@update')->name('comments.update');
+    Route::delete('comments/{comment}', 'CommentController@destroy')->name('comments.destroy');
 });
 
 // Front office

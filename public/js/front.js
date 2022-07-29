@@ -2119,7 +2119,13 @@ __webpack_require__.r(__webpack_exports__);
   name: 'SinglePost',
   data: function data() {
     return {
-      post: null
+      post: null,
+      formData: {
+        name: '',
+        content: ''
+      },
+      commentSent: false,
+      errors: {}
     };
   },
   created: function created() {
@@ -2134,6 +2140,21 @@ __webpack_require__.r(__webpack_exports__);
         name: 'page-404'
       });
     });
+  },
+  methods: {
+    addComment: function addComment() {
+      var _this2 = this;
+
+      // richiesta axios di tipo post per aggiungere il commento
+      axios.post("/api/comments/".concat(this.post.id), this.formData).then(function (resp) {
+        // console.log(resp.data.data);
+        _this2.commentSent = true;
+        _this2.formData.name = "";
+        _this2.formData.content = "";
+      })["catch"](function (error) {
+        _this2.errors = error.response.data.errors;
+      });
+    }
   }
 });
 
@@ -2594,7 +2615,94 @@ var render = function render() {
         }
       }
     }, [_vm._v(_vm._s(tag.name))])], 1);
+  }), 0)]) : _vm._e(), _vm._v(" "), _vm.post.comments.length > 0 ? _c("div", {
+    staticClass: "mt-3"
+  }, [_c("h3", [_vm._v("Commenti")]), _vm._v(" "), _c("ul", _vm._l(_vm.post.comments, function (comment) {
+    return _c("li", {
+      key: comment.id
+    }, [_c("h4", [_vm._v(_vm._s(comment.name ? comment.name : "Anonimo"))]), _vm._v(" "), _c("div", [_vm._v("\n                    " + _vm._s(comment.content) + "\n                ")])]);
   }), 0)]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "mt-3"
+  }, [_c("h3", [_vm._v("Lascia un commento")]), _vm._v(" "), _c("form", {
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.addComment();
+      }
+    }
+  }, [_c("div", {
+    staticClass: "mb-1"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formData.name,
+      expression: "formData.name"
+    }],
+    attrs: {
+      type: "text",
+      name: "name",
+      placeholder: "Inserisci il nome"
+    },
+    domProps: {
+      value: _vm.formData.name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+
+        _vm.$set(_vm.formData, "name", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _vm.errors.name ? _c("ul", {
+    staticStyle: {
+      color: "red"
+    }
+  }, _vm._l(_vm.errors.name, function (err, index) {
+    return _c("li", {
+      key: index
+    }, [_vm._v(_vm._s(err))]);
+  }), 0) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "mb-1"
+  }, [_c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formData.content,
+      expression: "formData.content"
+    }],
+    attrs: {
+      name: "content",
+      id: "content",
+      cols: "30",
+      rows: "10",
+      placeholder: "Inserisci il testo del commento"
+    },
+    domProps: {
+      value: _vm.formData.content
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+
+        _vm.$set(_vm.formData, "content", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _vm.errors.content ? _c("ul", {
+    staticStyle: {
+      color: "red"
+    }
+  }, _vm._l(_vm.errors.content, function (err, index) {
+    return _c("li", {
+      key: index
+    }, [_vm._v(_vm._s(err))]);
+  }), 0) : _vm._e()]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm.commentSent ? _c("div", {
+    staticClass: "mt-3",
+    staticStyle: {
+      color: "green",
+      border: "1px solid green"
+    }
+  }, [_vm._v("\n                Commento inserito in fase di approvazione\n            ")]) : _vm._e()])]), _vm._v(" "), _c("div", {
     staticClass: "mt-5"
   }, [_c("router-link", {
     attrs: {
@@ -2605,7 +2713,16 @@ var render = function render() {
   }, [_vm._v("Home Page")])], 1)]) : _vm._e();
 };
 
-var staticRenderFns = [];
+var staticRenderFns = [function () {
+  var _vm = this,
+      _c = _vm._self._c;
+
+  return _c("div", [_c("button", {
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Aggiungi Commento")])]);
+}];
 render._withStripped = true;
 
 
