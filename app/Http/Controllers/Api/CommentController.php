@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Mail\CommentMail;
+use App\Mail\CommentMailMarkdown;
+use Illuminate\Support\Facades\Mail;
+
 use App\Comment;
 
 class CommentController extends Controller
@@ -29,6 +33,12 @@ class CommentController extends Controller
         $newComment->save();
 
         // invio una notifica mail all'autore del post
+        try {
+            // Mail::to($newComment->post->user->email)->send(new CommentMail($newComment));
+            Mail::to($newComment->post->user->email)->send(new CommentMailMarkdown($newComment));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 
         // restituisco una risposta json positiva 200
         return $newComment;
